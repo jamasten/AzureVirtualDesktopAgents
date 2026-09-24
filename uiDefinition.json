@@ -1,0 +1,72 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2021-09-09/uiFormDefinition.schema.json",
+  "view": {
+    "kind": "Form",
+    "properties": {
+      "title": "Deploy AVD Agents",
+      "steps": [
+        {
+          "name": "basics",
+          "label": "Basics",
+          "elements": [
+            {
+              "type": "Microsoft.Common.SubscriptionSelector",
+              "name": "subscription",
+              "resourceProviders": [
+                "Microsoft.Compute"
+              ]
+            },
+            {
+              "type": "Microsoft.Common.LocationSelector",
+              "name": "location",
+              "label": "Select a region",
+              "resourceTypes": [
+                "Microsoft.BotService/botServices",
+                "Microsoft.KeyVault/vaults"
+              ],
+              "scope": {
+                "subscriptionId": "[steps('basics').subscription.subscriptionId]"
+              }
+            },
+            {
+              "name": "hostPoolSelector",
+              "type": "Microsoft.Solutions.ResourceSelector",
+              "label": "Host Pool",
+              "resourceType": "Microsoft.DesktopVirtualization/hostPools",
+              "constraints": {
+                "required": true
+              },
+              "scope": {
+                "location": "[steps('basics').location.name]",
+                "subscriptionId": "[steps('basics').subscription.subscriptionId]"
+              }
+            },
+            {
+              "name": "virtualMachineSelector",
+              "type": "Microsoft.Solutions.ResourceSelector",
+              "label": "Virtual Machine",
+              "resourceType": "Microsoft.Compute/virtualMachines",
+              "constraints": {
+                "required": true
+              },
+              "scope": {
+                "location": "[steps('basics').location.name]",
+                "subscriptionId": "[steps('basics').subscription.subscriptionId]"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "outputs": {
+      "parameters": {
+        "hostPoolResourceId": "[steps('basics').hostPoolSelector.id]",
+        "location": "[steps('basics').location.name]",
+        "virtualMachineResourceId": "[steps('basics').virtualMachineSelector.id]"
+      },
+      "kind": "ResourceGroup",
+      "location": "[steps('basics').location.name]",
+      "resourceGroupId": "[take(steps('basics').virtualMachineSelector.id, indexOf(steps('basics').virtualMachineSelector.id, '/providers/'))]"
+    }
+  }
+}

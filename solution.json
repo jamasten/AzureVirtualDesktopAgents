@@ -1,0 +1,207 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.47.16.16243",
+      "templateHash": "14642826430101024158"
+    }
+  },
+  "parameters": {
+    "hostPoolResourceId": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource ID of the host pool."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "The location for the deployments."
+      }
+    },
+    "timestamp": {
+      "type": "string",
+      "defaultValue": "[utcNow('yyyyMMddhhmmss')]",
+      "metadata": {
+        "description": "DO NOT MODIFY THIS VALUE! The timestamp is needed to differentiate deployments for certain Azure resources and must be set using a parameter."
+      }
+    },
+    "virtualMachineResourceId": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource ID for the target virtual machine."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('HostPoolRegistrationToken_{0}', parameters('timestamp'))]",
+      "subscriptionId": "[split(parameters('hostPoolResourceId'), '/')[2]]",
+      "resourceGroup": "[split(parameters('hostPoolResourceId'), '/')[4]]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "hostPoolName": {
+            "value": "[split(parameters('hostPoolResourceId'), '/')[8]]"
+          },
+          "hostPoolType": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('hostPoolResourceId'), '/')[2], split(parameters('hostPoolResourceId'), '/')[4]), 'Microsoft.DesktopVirtualization/hostPools', split(parameters('hostPoolResourceId'), '/')[8]), '2025-10-10').hostPoolType]"
+          },
+          "loadBalancerType": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('hostPoolResourceId'), '/')[2], split(parameters('hostPoolResourceId'), '/')[4]), 'Microsoft.DesktopVirtualization/hostPools', split(parameters('hostPoolResourceId'), '/')[8]), '2025-10-10').loadBalancerType]"
+          },
+          "location": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('hostPoolResourceId'), '/')[2], split(parameters('hostPoolResourceId'), '/')[4]), 'Microsoft.DesktopVirtualization/hostPools', split(parameters('hostPoolResourceId'), '/')[8]), '2025-10-10', 'full').location]"
+          },
+          "maxSessionLimit": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('hostPoolResourceId'), '/')[2], split(parameters('hostPoolResourceId'), '/')[4]), 'Microsoft.DesktopVirtualization/hostPools', split(parameters('hostPoolResourceId'), '/')[8]), '2025-10-10').maxSessionLimit]"
+          },
+          "preferredAppGroupType": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('hostPoolResourceId'), '/')[2], split(parameters('hostPoolResourceId'), '/')[4]), 'Microsoft.DesktopVirtualization/hostPools', split(parameters('hostPoolResourceId'), '/')[8]), '2025-10-10').preferredAppGroupType]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.47.16.16243",
+              "templateHash": "14102362984669566610"
+            }
+          },
+          "parameters": {
+            "hostPoolName": {
+              "type": "string"
+            },
+            "hostPoolType": {
+              "type": "string"
+            },
+            "loadBalancerType": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "maxSessionLimit": {
+              "type": "int"
+            },
+            "preferredAppGroupType": {
+              "type": "string",
+              "defaultValue": "Desktop"
+            },
+            "time": {
+              "type": "string",
+              "defaultValue": "[utcNow('u')]"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DesktopVirtualization/hostPools",
+              "apiVersion": "2023-09-05",
+              "name": "[parameters('hostPoolName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "hostPoolType": "[parameters('hostPoolType')]",
+                "loadBalancerType": "[parameters('loadBalancerType')]",
+                "maxSessionLimit": "[parameters('maxSessionLimit')]",
+                "preferredAppGroupType": "[parameters('preferredAppGroupType')]",
+                "registrationInfo": {
+                  "expirationTime": "[dateTimeAdd(parameters('time'), 'PT2H')]",
+                  "registrationTokenOperation": "Update"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('VirtualMachine_{0}', parameters('timestamp'))]",
+      "subscriptionId": "[split(parameters('virtualMachineResourceId'), '/')[2]]",
+      "resourceGroup": "[split(parameters('virtualMachineResourceId'), '/')[4]]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "hostPoolResourceId": {
+            "value": "[parameters('hostPoolResourceId')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "virtualMachineResourceId": {
+            "value": "[parameters('virtualMachineResourceId')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.47.16.16243",
+              "templateHash": "3548613942422212923"
+            }
+          },
+          "parameters": {
+            "hostPoolResourceId": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "virtualMachineResourceId": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "$fxv#0": "Param(\r\n    [string]$HostPoolRegistrationToken,\r\n    [string]$StorageSuffix\r\n)\r\n\r\n$ErrorActionPreference = 'Stop'\r\n\r\n$Counter = 0\r\n$FileName = 'Configuration.zip'\r\n\r\n# Download configuration ZIP file from the AVD PG storage account\r\ndo {\r\n    $URL = 'https://wvdportalstorageblob.blob.' + $StorageSuffix + '/galleryartifacts/Configuration_1.0.03519.1433.zip'\r\n    Invoke-WebRequest -Uri $URL -OutFile $FileName -ErrorAction 'SilentlyContinue'\r\n    if($Counter -gt 0)\r\n    {\r\n        Start-Sleep -Seconds 30\r\n    }\r\n    $Counter++\r\n}\r\nuntil((Test-Path $FileName) -or $Counter -eq 9)\r\n\r\n# Extract the ZIP files\r\nExpand-Archive -Path $FileName -Force\r\nSet-Location .\\Configuration\\\r\nExpand-Archive -Path 'DeployAgent.zip' -Force\r\nSet-Location .\\DeployAgent\\\r\n\r\n# Install the AVD Bootloader\r\n$BootInstaller = (Get-ChildItem -Path 'RDAgentBootLoaderInstall').FullName\r\nStart-Process -FilePath 'msiexec.exe' -ArgumentList \"/i $BootInstaller /quiet /qn /norestart /passive\" -Wait -Passthru\r\nStart-Sleep -Seconds 5\r\n\r\n# Install the AVD Agent\r\n$AgentInstaller = (Get-ChildItem -Path 'RDInfraAgentInstall').FullName\r\nStart-Process -FilePath 'msiexec.exe' -ArgumentList \"/i $AgentInstaller /quiet /qn /norestart /passive REGISTRATIONTOKEN=$HostPoolRegistrationToken\" -Wait -PassThru\r\nStart-Sleep -Seconds 5"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Compute/virtualMachines/runCommands",
+              "apiVersion": "2025-04-01",
+              "name": "[format('{0}/{1}', split(parameters('virtualMachineResourceId'), '/')[8], 'Set-SessionHostConfiguration')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "asyncExecution": false,
+                "parameters": [
+                  {
+                    "name": "StorageSuffix",
+                    "value": "[environment().suffixes.storage]"
+                  }
+                ],
+                "protectedParameters": [
+                  {
+                    "name": "HostPoolRegistrationToken",
+                    "value": "[listRegistrationTokens(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('hostPoolResourceId'), '/')[2], split(parameters('hostPoolResourceId'), '/')[4]), 'Microsoft.DesktopVirtualization/hostPools', split(parameters('hostPoolResourceId'), '/')[8]), '2025-10-10').value[0].token]"
+                  }
+                ],
+                "source": {
+                  "script": "[variables('$fxv#0')]"
+                },
+                "treatFailureAsDeploymentFailure": true
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('hostPoolResourceId'), '/')[2], split(parameters('hostPoolResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('HostPoolRegistrationToken_{0}', parameters('timestamp')))]"
+      ]
+    }
+  ]
+}
