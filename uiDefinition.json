@@ -21,8 +21,7 @@
               "name": "location",
               "label": "Select a region",
               "resourceTypes": [
-                "Microsoft.BotService/botServices",
-                "Microsoft.KeyVault/vaults"
+                "Microsoft.Compute/virtualMachines"
               ],
               "scope": {
                 "subscriptionId": "[steps('basics').subscription.subscriptionId]"
